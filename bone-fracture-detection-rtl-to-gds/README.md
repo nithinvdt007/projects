@@ -76,6 +76,8 @@ igny run make -C 08_sta corners
 igny run make -C 10_gds gds
 ```
 
+For a stage-by-stage description and the current evidence/limitations, see [the RTL-to-GDSII flow guide](docs/RTL_TO_GDSII_FLOW.md). The supplied screenshots are collected in the [stage image gallery](OUTPUT%20PICTURES/README.md).
+
 ## Captured flow status and limitations
 
 - Verilator lint completed with non-blocking filename and unused-`p22` warnings.
@@ -84,7 +86,7 @@ igny run make -C 10_gds gds
 - Archived timing reports showed post-placement STA at a 27 ns clock target (~37 MHz), with WNS/TNS of 0 ns at TT and SS. These are placement-based estimates, **not post-route timing signoff**. See [docs/reports/post-placement-sta.md](docs/reports/post-placement-sta.md).
 - A later route attempt stopped at TritonRoute error `DRT-0305` on a constant tie net (`one_` / `u_scharr/zero_`). Do not claim routed DRC/LVS signoff unless routing is regenerated and DRC/LVS are independently reviewed. See [docs/FLOW_STATUS.md](docs/FLOW_STATUS.md).
 
-The current GitHub folder contains the RTL, flow scripts, setup documentation, and status notes. Binary outputs (GDS, screenshots, and the PDF paper) were not transferred by the available text-file GitHub upload action; they are not linked here as if they were committed. The GDS snapshot in the original local archive should be treated as an unverified supplied artifact, not signoff.
+The stage screenshots are included as visual records of the supplied run; they are not independent verification evidence. The GDS binary itself is not included in this repository snapshot. Do not treat a screenshot or archived result as proof of a clean rebuild, timing closure, DRC/LVS completion, or physical signoff.
 
 ## Licensing
 
