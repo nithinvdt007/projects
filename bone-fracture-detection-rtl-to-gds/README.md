@@ -1,6 +1,6 @@
 # Bone Fracture Detection — RTL-to-GDS with SKY130A
 
-A Verilog implementation of a rule-based bone-fracture decision pipeline, adapted for an open-source-style RTL-to-GDS flow using Ignytion Crucible, Yosys, Verilator, OpenROAD/OpenSTA, and the SKY130A standard-cell PDK.
+A Verilog implementation of a rule-based bone-fracture decision pipeline, organized for an open-source-style RTL-to-GDS flow using Ignytion Crucible, Yosys, Verilator, OpenROAD/OpenSTA, and the SKY130A standard-cell PDK.
 
 > **Research prototype only.** This repository is not a medical device and is not validated for clinical diagnosis.
 
@@ -8,11 +8,11 @@ A Verilog implementation of a rule-based bone-fracture decision pipeline, adapte
 
 Top module: `top_level_final_decision` in `01_rtl/bone_fracture_top_combined.v`.
 
-1. **Pixel memory and windowing:** SRAM-style Verilog memory plus line buffers create the 3×3 pixel neighbourhood.
+1. **Pixel memory and windowing:** SRAM-style Verilog memory plus line buffers create a 3×3 pixel neighbourhood.
 2. **Directional gradients:** horizontal/vertical Scharr gradients plus two diagonal measures.
 3. **Binary masks:** configurable weak/strong gradient classification.
 4. **Rule scoring:** cluster, corner, chaos, and brightness counters.
-5. **Final decision:** programmable thresholds feed a voting block that produces the frame-level diagnosis and `output_valid`.
+5. **Final decision:** programmable thresholds feed a voting block that outputs the frame-level diagnosis and `output_valid`.
 
 ## Install Igny / Crucible
 
@@ -24,7 +24,7 @@ In Windows PowerShell (Administrator), install WSL2 and Ubuntu if needed:
 wsl --install -d Ubuntu
 ```
 
-Restart if requested, launch Ubuntu, then install host prerequisites:
+In Ubuntu, install host prerequisites:
 
 ```bash
 sudo apt update
@@ -37,17 +37,9 @@ Install the Ignytion Crucible Core beta CLI using the official installer:
 curl -fsSL https://get-beta.ignytion.io/v2/install.sh | bash
 ```
 
-Official CLI guide: https://docs.ignytion.io/crucible-cli/latest/CRUCIBLE_CLI_USER_GUIDE/
+Full guide: [docs/IGNY_SETUP.md](docs/IGNY_SETUP.md). Official CLI guide: https://docs.ignytion.io/crucible-cli/latest/CRUCIBLE_CLI_USER_GUIDE/
 
-Verify the commands available in your installed beta version:
-
-```bash
-igny --help
-igny env --help
-igny tool --help
-```
-
-### Enter and configure the workspace
+### Prepare the workspace
 
 From the repository root in Ubuntu/WSL:
 
@@ -55,27 +47,22 @@ From the repository root in Ubuntu/WSL:
 igny init
 ```
 
-If a command reports that environment `base` does not exist because `CRUCIBLE_ENV=base` is set, correct the current shell and select the project environment:
+If the CLI reports that environment `base` does not exist because `CRUCIBLE_ENV=base` is set:
 
 ```bash
 unset CRUCIBLE_ENV
 igny env use bone --workspace
 igny workspace sync
-```
-
-In the tested setup, `workspace sync` removed tools that were installed but absent from `crucible.lock`. Re-bind the required tools after syncing:
-
-```bash
 igny tool install make
 igny tool install yosys
 igny tool list
 ```
 
-Verilator requires host `g++` to compile its generated C++ code; this is a system package, not an Igny-managed EDA tool. The physical-design scripts discover SKY130A beneath `~/.ciel`. If needed, set `PDK_ROOT` to the directory containing the `sky130A/` folder.
+The archived environment omitted `make` and `yosys` from its lock file even though the flow uses them. Reinstall/bind them after syncing. `g++` is a host dependency for Verilator. The physical-design scripts look for SKY130A under `~/.ciel`; if needed, set `PDK_ROOT` to the parent directory containing `sky130A/`.
 
-## Run the flow
+## Run stages
 
-Run each step from the workspace root and stop if a stage fails. The project does not include a dedicated validated bone-image testbench, so simulation is not claimed here.
+Run each stage from the workspace root and stop on the first failure. No dedicated validated bone-image testbench is included, so simulation is not claimed.
 
 ```bash
 igny run make lint
@@ -89,29 +76,15 @@ igny run make -C 08_sta corners
 igny run make -C 10_gds gds
 ```
 
-## Captured status and limitations
+## Captured flow status and limitations
 
 - Verilator lint completed with non-blocking filename and unused-`p22` warnings.
-- Yosys produced a mapped SKY130 netlist and area statistics.
+- Yosys produced a mapped SKY130 netlist and statistics in the supplied workspace.
 - Floorplanning and detailed placement completed in the supplied workspace.
-- The archived timing summary reports post-placement STA with a 27 ns clock target (about 37 MHz), placement-estimated parasitics, and WNS/TNS of 0 ns at TT and SS. These values **are not post-route timing signoff**.
-- Routing attempts in the supplied session stopped at TritonRoute error `DRT-0305` on constant nets (`one_` / `u_scharr/zero_`). Do not claim routed DRC/LVS signoff unless the route is regenerated and DRC/LVS are independently reviewed.
+- Archived timing reports showed post-placement STA at a 27 ns clock target (~37 MHz), with WNS/TNS of 0 ns at TT and SS. These are placement-based estimates, **not post-route timing signoff**. See [docs/reports/post-placement-sta.md](docs/reports/post-placement-sta.md).
+- A later route attempt stopped at TritonRoute error `DRT-0305` on a constant tie net (`one_` / `u_scharr/zero_`). Do not claim routed DRC/LVS signoff unless routing is regenerated and DRC/LVS are independently reviewed. See [docs/FLOW_STATUS.md](docs/FLOW_STATUS.md).
 
-Generated OpenROAD databases, netlists, and final GDS files are intentionally not treated as validated release outputs in this source repository. Generate them using the flow above and review their logs before publishing them as signoff artifacts.
-
-## Repository layout
-
-```text
-01_rtl/                  Bone-detection RTL
-04_synthesis/             Yosys synthesis and SDC generation
-06_floorplanning/         OpenROAD floorplan / tapcells / PDN
-07_placement/              Global and detailed placement
-08_sta/                    OpenSTA scripts and archived timing snapshots
-09_place_and_route/        CTS and routing scripts
-10_gds/                    GDS streamout script and layer map
-11_physical_verification/ Physical-verification scripts and status
-docs/                      Igny setup guide and flow notes
-```
+The current GitHub folder contains the RTL, flow scripts, setup documentation, and status notes. Binary outputs (GDS, screenshots, and the PDF paper) were not transferred by the available text-file GitHub upload action; they are not linked here as if they were committed. The GDS snapshot in the original local archive should be treated as an unverified supplied artifact, not signoff.
 
 ## Licensing
 
