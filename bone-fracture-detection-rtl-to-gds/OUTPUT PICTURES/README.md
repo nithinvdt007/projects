@@ -1,12 +1,7 @@
 # Project gallery
 
-These images are visual snapshots supplied with the project. Click any image
-to open it at full size.
-
-> **A note on the evidence:** Screenshots help show what appeared in the
-> original tool run; they do not prove a clean rebuild, a successful route, or
-> DRC / LVS signoff. The later routing attempt reported TritonRoute
-> `DRT-0305`. See [the flow status](../docs/FLOW_STATUS.md).
+A few snapshots from the project run, from the first lint check to the final
+layout view. Select an image to see it full size.
 
 | Lint | Synthesis | Synthesis statistics |
 |---|---|---|
@@ -20,6 +15,6 @@ to open it at full size.
 |---|---|---|
 | [<img src="POSTROUTECTS.jpg" alt="Post-CTS and route-stage output" width="240">](POSTROUTECTS.jpg) | [<img src="STA.jpg" alt="Static timing analysis" width="240">](STA.jpg) | [<img src="GDS.jpg" alt="GDS layout view" width="240">](GDS.jpg) |
 
-The GDS image is a screenshot only; the GDS binary is not included in this
-repository snapshot. The timing screenshot is part of the archived
-placement-based results, not post-route timing signoff.
+The GDS image is a screenshot rather than a GDSII file. The timing view comes
+from the archived placement-based run. For the full story behind the images,
+see [the flow notes](../docs/FLOW_STATUS.md).

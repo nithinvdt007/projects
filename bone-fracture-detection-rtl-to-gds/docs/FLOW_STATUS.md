@@ -1,8 +1,8 @@
-# What the supplied run shows
+# Notes from the project run
 
-This page records the evidence that came with the project. It is a snapshot
-of a supplied workspace—not a report of a clean, end-to-end rebuild from this
-repository.
+The table below separates files included here from results observed in the
+original workspace. It should help set expectations when you browse the
+project or try the flow yourself.
 
 | Stage | Included in this repository | What the supplied run tells us |
 |---|---|---|
@@ -16,7 +16,14 @@ repository.
 | GDSII | A screenshot of a layout view; no GDS binary | The image is a visual record only, not a physical-design deliverable. |
 | Physical verification | No verified DRC / LVS result | Physical signoff has not been established. |
 
-## What to do next
+## Where the flow stands
+
+Lint, synthesis, floorplanning, placement, and clock-tree synthesis were
+reported in the original workspace. The timing summary is placement-based.
+The later routing attempt stopped at TritonRoute `DRT-0305`, so post-route
+timing and physical verification still need attention.
+
+## Next steps
 
 1. Rebuild from the RTL using the configured tools and record the exact tool
    versions and commands.
@@ -25,8 +32,7 @@ repository.
 4. Re-run timing analysis with post-route parasitics.
 5. Archive the resulting machine-readable reports alongside any screenshots.
 
-Until then, treat the screenshots and archived outputs as useful project
-context—not proof of reproducibility, timing closure, or physical signoff.
-
-See the [RTL-to-GDSII flow guide](RTL_TO_GDSII_FLOW.md) for stage details and
-the [setup guide](IGNY_SETUP.md) for the tool environment.
+The screenshots are here to show the work and tell the story of the run.
+Rebuilding the flow and checking the final reports is the way to confirm a
+result. See the [RTL-to-GDSII flow guide](RTL_TO_GDSII_FLOW.md) for stage
+details and the [setup guide](IGNY_SETUP.md) to get started.

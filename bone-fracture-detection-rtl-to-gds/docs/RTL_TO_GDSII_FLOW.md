@@ -1,54 +1,50 @@
-# Following the RTL-to-GDSII flow
+# From RTL to GDSII
 
-This project is arranged around the steps an RTL design typically takes on
-its way to a GDSII layout. The scripts use Verilator, Yosys, OpenROAD / OpenSTA,
-and the SKY130A standard-cell library through Ignytion Crucible.
+Here’s how the project is intended to move from Verilog source to a chip
+layout. The scripts use Verilator, Yosys, OpenROAD / OpenSTA, and the SKY130A
+standard-cell library through Ignytion Crucible.
 
-The stage notes below describe the **supplied workspace snapshot**. They do
-not mean that a fresh checkout has completed every step or passed signoff.
-For the current evidence in one place, see [Flow status](FLOW_STATUS.md).
+The stage notes reflect the original project run. For a quick summary of what
+is included here and what remains, see [Flow notes](FLOW_STATUS.md).
 
-## The journey, stage by stage
+## The stages
 
-### 00–03 · Check and exercise the RTL
+### 00–03 · Explore the RTL
 
-- **00 — Lint:** Verilator reported non-blocking filename and unused-`p22`
-  warnings in the supplied run.
+- **00 — Lint:** Verilator checked the source; the captured run showed
+  filename and unused-`p22` warnings.
 - **01 — RTL:** The Verilog design lives in
   [`01_rtl/bone_fracture_top_combined.v`](../01_rtl/bone_fracture_top_combined.v).
-- **02 — Simulation:** A validated bone-image simulation testbench is not
-  included, so simulation results are not claimed.
-- **03 — Functional verification:** A bone-specific verification suite is
-  not included in this repository snapshot.
+- **02 — Simulation:** A bone-image testbench is not included.
+- **03 — Verification:** A design-specific functional test suite is not
+  included.
 
-### 04–05 · Synthesize and prepare for test
+### 04–05 · Turn RTL into cells
 
-- **04 — Synthesis:** Yosys mapped the design to SKY130 cells in the supplied
-  workspace. Regenerate the output before relying on an archived netlist.
-- **05 — DFT:** Scan insertion and design-for-test checks are not implemented.
+- **04 — Synthesis:** Yosys maps the design to SKY130 cells. A synthesis run
+  was recorded in the original workspace.
+- **05 — DFT:** Scan insertion and design-for-test checks are not part of the
+  current flow.
 
-### 06–09 · Build the physical implementation
+### 06–09 · Shape and connect the design
 
-- **06 — Floorplanning:** Floorplan DEF / ODB outputs exist in the supplied
-  workspace.
-- **07 — Placement:** Detailed placement completed in the supplied workspace.
-- **08 — Timing analysis:** Archived TT / SS reports show placement-based
-  estimates at a 27 ns clock target. They are not post-route timing signoff.
-- **09 — Clock tree and routing:** A later routing attempt stopped with
-  TritonRoute error `DRT-0305` on a constant tie net. Resolve and rerun the
-  route before relying on downstream results.
+- **06 — Floorplanning:** Set up the core area, rows, and I/O locations.
+- **07 — Placement:** Arrange and legalize the standard cells.
+- **08 — Timing:** The archived TT / SS summary uses placement-based
+  estimates at a 27 ns clock target.
+- **09 — Clock tree and routing:** Build the clock tree and connect the
+  design. A later route attempt stopped with TritonRoute error `DRT-0305` on
+  a constant tie net; the route still needs to be resolved and rerun.
 
-### 10–11 · Stream out and verify
+### 10–11 · Create and check the layout
 
-- **10 — GDSII:** A screenshot of a GDS view is included in the
-  [image gallery](../OUTPUT%20PICTURES/README.md); the GDS binary is not
-  included in this repository snapshot.
-- **11 — Physical verification:** The supplied materials do not establish
-  DRC / LVS signoff. Independently run and review foundry-appropriate checks.
+- **10 — GDSII:** Stream out the routed layout. The
+  [image gallery](../OUTPUT%20PICTURES/README.md) includes a layout screenshot;
+  it is not a GDSII file.
+- **11 — Physical verification:** Run and review physical DRC and LVS checks.
+  Completed signoff results are not included here.
 
-The numbered directories in the original workspace describe the intended
-flow. Not every stage has a corresponding implementation or validated result
-in this repository snapshot.
+The numbered folders make it easy to find each stage’s scripts and notes.
 
 ## Set up the tools
 
@@ -56,9 +52,9 @@ Follow [the Ubuntu / WSL2 setup guide](IGNY_SETUP.md) first. The physical
 design stages also need SKY130A available through `PDK_ROOT`; do not copy the
 PDK libraries into this repository.
 
-## Run the configured stages
+## Run the stages
 
-From the project root, run one command at a time and stop if anything fails:
+From the project root, run the stages in order:
 
 ```bash
 igny run make lint
@@ -71,23 +67,18 @@ igny run make sta
 igny run make gds
 ```
 
-The root [`Makefile`](../Makefile) provides these stage targets and an `all`
-target. An `all` run is not a substitute for checking individual stage
-results: in particular, do not treat downstream output as verified if the
-routing step fails. GDS streamout needs a completed route and the SKY130
-LEF/DEF layer map described in [`10_gds/README.md`](../10_gds/README.md).
+These targets are also collected in the root [`Makefile`](../Makefile). Check
+each stage’s output as you go; later steps depend on earlier ones. GDS
+streamout needs a completed route and the SKY130 LEF/DEF layer map described
+in [`10_gds/README.md`](../10_gds/README.md).
 
-## Reading the timing snapshot
+## Making sense of the timing numbers
 
-The archived TT and SS timing summary records 0.00 ns WNS and 0.00 ns TNS
-with a 27 ns clock target (about 37 MHz). These figures use
-**placement-based parasitics**. They do not demonstrate post-route timing
-closure. See the
-[timing summary](reports/post-placement-sta.md).
+The archived TT and SS summary records 0.00 ns WNS and 0.00 ns TNS with a
+27 ns clock target (about 37 MHz). These are placement-based estimates, not
+post-route timing results. See the [timing summary](reports/post-placement-sta.md).
 
-## Before calling it signoff
+## After routing
 
-First resolve `DRT-0305` and regenerate the route. Then review the routing DRC
-report, run the appropriate physical DRC and LVS checks, and analyze timing
-with post-route parasitics. Screenshots and archived reports are helpful
-context, but they are not a substitute for those checks.
+Resolve `DRT-0305`, regenerate the route, and review the resulting reports.
+Then run physical DRC and LVS, and check timing with post-route parasitics.
