@@ -1,27 +1,33 @@
-# Igny / Crucible installation and setup
+# Getting the toolchain ready
 
-These instructions are for the Ignytion **Crucible Core** `igny` CLI used by this project. Crucible is a beta toolchain; verify commands available in your installed release with `igny --help` and the official [CLI guide](https://docs.ignytion.io/crucible-cli/latest/CRUCIBLE_CLI_USER_GUIDE/).
+The project flow uses the Ignytion Crucible Core `igny` CLI. These notes
+reflect the beta toolchain used when the project was prepared; CLI commands
+and available tools may change between releases. When a command differs,
+check `igny --help` and the [official Crucible CLI guide](https://docs.ignytion.io/crucible-cli/latest/CRUCIBLE_CLI_USER_GUIDE/).
 
-## 1. Windows: install WSL2 with Ubuntu
+## 1. Use Ubuntu or WSL2
 
-Open PowerShell as Administrator and run:
+The flow was developed in Ubuntu under WSL2. On Windows, open PowerShell as
+Administrator and install Ubuntu if you do not already have it:
 
 ```powershell
 wsl --install -d Ubuntu
 ```
 
-Restart if requested, launch Ubuntu, and use your normal Linux user. Native Linux users can skip this section.
+Restart if Windows asks you to, then open Ubuntu and use your regular Linux
+account. Native Linux users can skip this step.
 
 ## 2. Install host prerequisites
 
-In Ubuntu/Linux:
+In Ubuntu, install the basic host packages:
 
 ```bash
 sudo apt update
 sudo apt install -y curl git g++ python3
 ```
 
-`g++` is needed by Verilator's generated C++ build. It is a host dependency, not an Igny-managed EDA tool.
+`g++` is needed for Verilator's generated C++ build. It is a host dependency,
+not an Igny-managed EDA tool.
 
 ## 3. Install Ignytion Crucible Core
 
@@ -31,7 +37,8 @@ Run the official beta installer as your normal Linux user:
 curl -fsSL https://get-beta.ignytion.io/v2/install.sh | bash
 ```
 
-Then check the CLI and installed subcommands:
+Then confirm the CLI is available and check the commands supported by your
+installed version:
 
 ```bash
 igny --help
@@ -39,26 +46,29 @@ igny env --help
 igny tool --help
 ```
 
-Official docs: https://docs.ignytion.io/crucible-cli/latest/CRUCIBLE_CLI_USER_GUIDE/
+See the [official CLI guide](https://docs.ignytion.io/crucible-cli/latest/CRUCIBLE_CLI_USER_GUIDE/)
+for current installation and usage information.
 
-## 4. Enter and select the project environment
+## 4. Initialize the project workspace
 
-From the repository directory:
+From this project directory in Ubuntu / WSL2:
 
 ```bash
 igny init
 ```
 
-If the CLI complains that environment `base` does not exist because `CRUCIBLE_ENV=base` is set, run:
+If the CLI complains that the `base` environment is missing and you have
+`CRUCIBLE_ENV=base` set, unset it and select the project's `bone` environment:
 
 ```bash
 unset CRUCIBLE_ENV
 igny env use bone --workspace
 ```
 
-Exact commands vary by beta CLI version; check `igny env --help` if a command is not recognized. The workspace path and banner's environment label are separate concepts.
+The exact environment commands can vary by beta release. If a command is not
+recognized, check `igny env --help`.
 
-## 5. Sync and install required tools
+## 5. Sync and check the tools
 
 ```bash
 igny workspace sync
@@ -67,21 +77,28 @@ igny tool install yosys
 igny tool list
 ```
 
-The archived tool list did not include `make` and `yosys`, even though the flow invokes them. Install them after syncing. Do not assume an environment-lock subcommand exists in every beta release.
+The archived tool list did not include `make` and `yosys`, even though the
+flow invokes them, so they may need to be installed after syncing. The other
+expected tools include Verilator, OpenROAD, OpenSTA, Magic, Netgen,
+`klayout-stream`, and Ciel; availability depends on the registry and platform.
 
-The expected EDA tools include Verilator, OpenROAD, Magic, Netgen, `klayout-stream`, Ciel, and Yosys. Availability depends on the registry/platform.
+## 6. Make SKY130A available
 
-## 6. SKY130A PDK
-
-The flow expects `$PDK_ROOT/sky130A/libs.ref/sky130_fd_sc_hd/`. The scripts try to discover the PDK under `~/.ciel`. If necessary, set the parent directory containing `sky130A/`:
+The flow expects the PDK to contain
+`sky130A/libs.ref/sky130_fd_sc_hd/`. Its scripts try to find SKY130A under
+`~/.ciel`. If the automatic lookup does not work, point `PDK_ROOT` to the
+parent directory that contains `sky130A`:
 
 ```bash
 export PDK_ROOT="$HOME/.ciel/ciel/sky130/versions/<installed-version>"
 ```
 
-Replace the placeholder with the actual installed version directory. Do not copy PDK libraries into this repository.
+Replace `<installed-version>` with the directory on your system. Do not copy
+PDK libraries into this repository.
 
-## 7. Quick check
+## 7. Run a quick check
+
+From the project root:
 
 ```bash
 pwd
@@ -89,4 +106,7 @@ igny tool list
 igny run make lint
 ```
 
-Stop on the first failed stage; later-stage databases may otherwise be stale.
+If lint fails, resolve that before moving on. Later physical-design stages
+depend on earlier outputs, which may otherwise be missing or stale. See the
+[flow guide](RTL_TO_GDSII_FLOW.md) for the stage commands and
+[current flow status](FLOW_STATUS.md) for known limitations.

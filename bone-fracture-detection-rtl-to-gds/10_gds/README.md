@@ -1,5 +1,13 @@
-# GDS streamout
+# GDSII streamout
 
-The original working archive included a GDS snapshot and a SKY130 LEF/DEF layer map, but binary artifacts were not transferred through the connected GitHub text-file upload action. The streamout target therefore needs the PDK layer map at `10_gds/lefdef_layer_map.txt` and a completed `09_place_and_route/route.def`.
+The streamout stage converts a successfully routed design into a GDSII
+layout. It requires both:
 
-Use `klayout-stream` only after routing completes successfully. Do not treat a supplied old GDS snapshot as proof of successful current routing or physical signoff.
+- a completed `09_place_and_route/route.def`; and
+- the SKY130 LEF/DEF layer map at `10_gds/lefdef_layer_map.txt`.
+
+The layer map and routed DEF are not included in this repository snapshot.
+Run `klayout-stream` only after regenerating a successful route and providing
+the required PDK layer map. The
+[GDS gallery image](../OUTPUT%20PICTURES/README.md) is a screenshot—not a GDS
+file, and not evidence of current routing or physical signoff.

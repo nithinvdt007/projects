@@ -1,93 +1,97 @@
-# Bone Fracture Detection — RTL-to-GDS with SKY130A
+<div align="center">
 
-A Verilog implementation of a rule-based bone-fracture decision pipeline, organized for an open-source-style RTL-to-GDS flow using Ignytion Crucible, Yosys, Verilator, OpenROAD/OpenSTA, and the SKY130A standard-cell PDK.
+# Bone Fracture Detection
 
-> **Research prototype only.** This repository is not a medical device and is not validated for clinical diagnosis.
+### An experimental Verilog design and RTL-to-GDSII learning project
 
-## Architecture
+**RTL · SKY130A · Yosys · OpenROAD · OpenSTA**
 
-Top module: `top_level_final_decision` in `01_rtl/bone_fracture_top_combined.v`.
+<img src="OUTPUT%20PICTURES/GDS.jpg" alt="Screenshot of the supplied GDS layout view" width="760">
 
-1. **Pixel memory and windowing:** SRAM-style Verilog memory plus line buffers create a 3×3 pixel neighbourhood.
-2. **Directional gradients:** horizontal/vertical Scharr gradients plus two diagonal measures.
-3. **Binary masks:** configurable weak/strong gradient classification.
-4. **Rule scoring:** cluster, corner, chaos, and brightness counters.
-5. **Final decision:** programmable thresholds feed a voting block that outputs the frame-level diagnosis and `output_valid`.
+*A screenshot from the supplied project run. It is a visual preview—not physical signoff.*
 
-## Install Igny / Crucible
+</div>
 
-This flow was developed in Ubuntu under WSL2. Use your normal Linux username, not `root`, unless you intentionally want the installation stored under `/root`.
+> [!IMPORTANT]
+> **Research prototype only.** This project is not a medical device and has not
+> been validated for clinical use. It must not be used to make healthcare
+> decisions.
 
-In Windows PowerShell (Administrator), install WSL2 and Ubuntu if needed:
+## Welcome
 
-```powershell
-wsl --install -d Ubuntu
-```
+This repository brings together a rule-based bone-fracture decision design
+written in Verilog and an experimental RTL-to-GDSII flow built around
+open-source EDA tools. It is intended as a learning and engineering project:
+explore the RTL, follow the implementation stages, and see which results
+are—and are not—supported by the supplied run.
 
-In Ubuntu, install host prerequisites:
+The design's top module is `top_level_final_decision`, in
+[`01_rtl/bone_fracture_top_combined.v`](01_rtl/bone_fracture_top_combined.v).
+It accepts pixel-memory writes and programmable score thresholds, then
+produces a frame-level decision, a validity signal, and debug outputs.
 
-```bash
-sudo apt update
-sudo apt install -y curl git g++ python3
-```
+## At a glance
 
-Install the Ignytion Crucible Core beta CLI using the official installer:
+| | |
+|---|---|
+| **Hardware description** | Verilog |
+| **Target library** | SKY130A standard-cell library |
+| **Flow tools** | Verilator, Yosys, OpenROAD / OpenSTA, Ignytion Crucible |
+| **Design scope** | Pixel windowing, gradient-based features, rule scores, and a final vote |
+| **Current evidence** | RTL, flow scripts, archived timing notes, and nine stage screenshots |
+| **Not established** | Clean end-to-end rebuild, post-route timing closure, DRC/LVS signoff |
 
-```bash
-curl -fsSL https://get-beta.ignytion.io/v2/install.sh | bash
-```
+## How the design is organized
 
-Full guide: [docs/IGNY_SETUP.md](docs/IGNY_SETUP.md). Official CLI guide: https://docs.ignytion.io/crucible-cli/latest/CRUCIBLE_CLI_USER_GUIDE/
+The RTL builds a 3 × 3 pixel neighborhood, calculates directional gradient
+features, classifies edge masks, and accumulates cluster, corner, chaos, and
+brightness scores. A vote block compares the accumulated scores with the
+provided thresholds and produces the frame-level result.
 
-### Prepare the workspace
+This is a description of the supplied RTL—not a claim that the algorithm has
+been validated on medical images.
 
-From the repository root in Ubuntu/WSL:
+## Take a look around
 
-```bash
-igny init
-```
+- [RTL-to-GDSII flow guide](docs/RTL_TO_GDSII_FLOW.md) — what each numbered
+  stage does and how to try the configured flow.
+- [Toolchain setup](docs/IGNY_SETUP.md) — Ubuntu / WSL2, Ignytion Crucible,
+  and SKY130A setup notes.
+- [Captured flow status](docs/FLOW_STATUS.md) — a concise record of the
+  supplied run and its limitations.
+- [Screenshot gallery](OUTPUT%20PICTURES/README.md) — lint through GDS-view
+  images, with context for what they do and do not show.
+- [Post-placement timing summary](docs/reports/post-placement-sta.md) —
+  archived TT / SS results and their scope.
 
-If the CLI reports that environment `base` does not exist because `CRUCIBLE_ENV=base` is set:
+## Try the first check
 
-```bash
-unset CRUCIBLE_ENV
-igny env use bone --workspace
-igny workspace sync
-igny tool install make
-igny tool install yosys
-igny tool list
-```
-
-The archived environment omitted `make` and `yosys` from its lock file even though the flow uses them. Reinstall/bind them after syncing. `g++` is a host dependency for Verilator. The physical-design scripts look for SKY130A under `~/.ciel`; if needed, set `PDK_ROOT` to the parent directory containing `sky130A/`.
-
-## Run stages
-
-Run each stage from the workspace root and stop on the first failure. No dedicated validated bone-image testbench is included, so simulation is not claimed.
+The flow was developed for Ubuntu / WSL2. Once the tools are installed and the
+workspace is configured, run the lint stage from this project directory:
 
 ```bash
 igny run make lint
-igny run make synth
-igny run make -C 06_floorplanning floorplan
-igny run make -C 07_placement place
-igny run make -C 08_sta corners
-igny run make -C 09_place_and_route cts
-igny run make -C 09_place_and_route route
-igny run make -C 08_sta corners
-igny run make -C 10_gds gds
 ```
 
-For a stage-by-stage description and the current evidence/limitations, see [the RTL-to-GDSII flow guide](docs/RTL_TO_GDSII_FLOW.md). The supplied screenshots are collected in the [stage image gallery](OUTPUT%20PICTURES/README.md).
+If that succeeds, the [flow guide](docs/RTL_TO_GDSII_FLOW.md) lists the
+remaining configured stages. Run them one by one and stop if a stage fails:
+the archived routing attempt hit a TritonRoute error, so later results should
+not be assumed to be current or reproducible.
 
-## Captured flow status and limitations
+## What the supplied results tell us
 
-- Verilator lint completed with non-blocking filename and unused-`p22` warnings.
-- Yosys produced a mapped SKY130 netlist and statistics in the supplied workspace.
-- Floorplanning and detailed placement completed in the supplied workspace.
-- Archived timing reports showed post-placement STA at a 27 ns clock target (~37 MHz), with WNS/TNS of 0 ns at TT and SS. These are placement-based estimates, **not post-route timing signoff**. See [docs/reports/post-placement-sta.md](docs/reports/post-placement-sta.md).
-- A later route attempt stopped at TritonRoute error `DRT-0305` on a constant tie net (`one_` / `u_scharr/zero_`). Do not claim routed DRC/LVS signoff unless routing is regenerated and DRC/LVS are independently reviewed. See [docs/FLOW_STATUS.md](docs/FLOW_STATUS.md).
+The archived run notes record lint, synthesis, floorplanning, placement, and
+placement-based timing results. They are useful project history, but they
+come from a supplied workspace—not a demonstrated clean checkout.
 
-The stage screenshots are included as visual records of the supplied run; they are not independent verification evidence. The GDS binary itself is not included in this repository snapshot. Do not treat a screenshot or archived result as proof of a clean rebuild, timing closure, DRC/LVS completion, or physical signoff.
+In particular, the 27 ns timing snapshot uses placement-based parasitics; it
+does not prove post-route timing closure. A later routing attempt reported
+TritonRoute error `DRT-0305` on a constant tie net. The GDS image in the
+gallery is only a screenshot; no GDS binary is included here. DRC/LVS signoff
+has not been established. More detail is in [the flow status](docs/FLOW_STATUS.md).
 
-## Licensing
+## License and attribution
 
-No project license was supplied. Until the authors choose one, all rights remain with the applicable copyright holders. Check third-party and PDK terms before redistribution.
+No project license was supplied. Until the relevant authors or rights holders
+choose one, all rights remain with them. Check the licensing terms for any
+third-party material and PDK assets before redistributing the project.
