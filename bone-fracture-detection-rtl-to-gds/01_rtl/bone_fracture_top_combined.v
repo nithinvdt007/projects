@@ -155,17 +155,41 @@ module top_level_final_decision #(
     wire confusion_flag;
     wire frame_start = (state == S_IDLE) && start;
 
+    // Pipeline Scharr-derived features before the score accumulators.
+    // This breaks the long Scharr -> absolute-value/mask -> accumulator path.
+    reg cluster_mask_d;
+    reg corner_mask_d;
+    reg chaos_mask_d;
+    reg signed [15:0] grad_mag_d;
+    reg counter_enable_d;
+
+    always @(posedge clk) begin
+        if (reset) begin
+            cluster_mask_d <= 1'b0;
+            corner_mask_d <= 1'b0;
+            chaos_mask_d <= 1'b0;
+            grad_mag_d <= 16'sd0;
+            counter_enable_d <= 1'b0;
+        end else begin
+            cluster_mask_d <= cluster_mask;
+            corner_mask_d <= corner_mask;
+            chaos_mask_d <= chaos_mask;
+            grad_mag_d <= grad_mag;
+            counter_enable_d <= (state == S_READ);
+        end
+    end
+
     rule_counter_unit #(
         .SCORE_WIDTH(SCORE_WIDTH),
         .BRIGHTNESS_WIDTH(BRIGHTNESS_WIDTH)
     ) u_counter (
         .clk(clk),
         .reset(reset),
-        .enable(state == S_READ),
-        .cluster_mask_in(cluster_mask),
-        .corner_mask_in(corner_mask),
-        .chaos_mask_in(chaos_mask),
-        .grad_mag_in(grad_mag),
+        .enable(counter_enable_d),
+        .cluster_mask_in(cluster_mask_d),
+        .corner_mask_in(corner_mask_d),
+        .chaos_mask_in(chaos_mask_d),
+        .grad_mag_in(grad_mag_d),
         .frame_start(frame_start),
         .cluster_score_out(cluster_score),
         .corner_score_out(corner_score),
