@@ -20,6 +20,7 @@ __pycache__/
 09_place_and_route/route.spef
 09_place_and_route/route.guide
 09_place_and_route/route_output.v
+!09_place_and_route/route_output.v
 09_place_and_route/route_drc.rpt
 09_place_and_route/route_maze.log
 10_gds/top_level_final_decision.gds

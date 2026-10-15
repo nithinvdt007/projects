@@ -44,8 +44,8 @@ Pixel data → 3 × 3 window → edge features → rule scores → final vote
 | **Language** | Verilog |
 | **Target** | SKY130A standard-cell library |
 | **Tools** | Verilator · Yosys · OpenROAD / OpenSTA · Ignytion Crucible |
-| **In this repo** | RTL, flow scripts, setup notes, timing summary, nine screenshots |
-| **Still to do** | Reproducible end-to-end run, clean routing, post-route timing, physical verification |
+| **In this repo** | Core RTL flow, stage 12 chip I/O integration, GDSII, screenshots, and reported QoR |
+| **Still to do** | Clean-room reproduction, complete raw reports, and full-chip physical verification |
 
 ## Explore
 
@@ -53,7 +53,8 @@ Pixel data → 3 × 3 window → edge features → rule scores → final vote
 |---|---|
 | [RTL-to-GDSII flow](docs/RTL_TO_GDSII_FLOW.md) | A tour of the stages and commands to run them. |
 | [Toolchain setup](docs/IGNY_SETUP.md) | Ubuntu / WSL2, Ignytion Crucible, and SKY130A setup. |
-| [Flow notes](docs/FLOW_STATUS.md) | What is present in the repository and what the original run showed. |
+| [Flow notes](docs/FLOW_STATUS.md) | What is present in the repository and what the original core run showed. |
+| [Post-I/O chip integration](docs/CHIP_IO_STATUS.md) | Stage 12 scripts, chip GDS, screenshots, QoR, and verification limits. |
 | [Image gallery](OUTPUT%20PICTURES/README.md) | Screenshots from lint through the layout view. |
 | [Timing snapshot](docs/reports/post-placement-sta.md) | The archived TT / SS placement-based timing summary. |
 
@@ -71,12 +72,13 @@ order and checking its output before continuing.
 
 ## A note on the results
 
-The screenshots and timing summary are records from the supplied project run.
-They make a useful tour of the flow, but a fresh end-to-end run has not been
-established from this repository. A later routing attempt encountered
-TritonRoute error `DRT-0305`; post-route timing and DRC / LVS verification
-remain to be completed. The gallery contains a layout screenshot, not a GDSII
-file. See [Flow notes](docs/FLOW_STATUS.md) for details.
+The screenshots and timing summary record the supplied core-flow run. That
+core-only run later encountered TritonRoute error `DRT-0305`. This repository
+also includes a separate post-I/O-pad integration run with the
+`chip_io_wrapper` top and `chip_final_ring.gds`; its QoR summary is reported
+with evidence caveats, and full-chip foundry DRC/LVS is not included. See the
+[chip I/O status](docs/CHIP_IO_STATUS.md), [chip stage guide](12_chip_physical/README.md),
+and [QoR summary](crucible-results/QOR_CHIP_IO.md).
 
 ## License
 
