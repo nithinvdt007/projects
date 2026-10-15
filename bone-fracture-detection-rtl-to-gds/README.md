@@ -28,9 +28,8 @@ This GDS is only a global-route preview. Routing guides are not completed detail
 
 ## Gallery
 
-See the [project gallery](OUTPUT%20PICTURES/README.md) for core-flow screenshots and the corrected chip-I/O preview.
-
+The [gallery](OUTPUT%20PICTURES/README.md) separates the earlier **core-only screenshots without SRAM** from the corrected post-I/O SRAM-backed result. The post-I/O archive supplies one GDS preview image and reports/logs, not a set of stage screenshots.
+ 
 ## License
 
 No project license has been provided. Review the terms for the RTL authors, tools, and third-party PDK content before redistribution.
-
