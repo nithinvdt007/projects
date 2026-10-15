@@ -60,7 +60,7 @@ Use the numbered stage directories for the scripts and inputs. The root [Makefil
 
 ## Results and screenshots
 
-The [gallery](OUTPUT%20PICTURES/README.md) labels the earlier core-flow screenshots separately; those images show the core without the SRAM macro. The final chip-I/O run is represented by its single GDS screenshot and the saved QoR/report files. The full GDS is available as [`chip_final_ring.gds.gz`](12_chip_physical/results/chip_final_ring.gds.gz).
+The [gallery](OUTPUT%20PICTURES/README.md) contains the supplied core RTL-to-GDS screenshots with the SRAM macro, captured before I/O pad integration. The completed post-I/O result is shown separately with its final GDS screenshot and saved QoR/report files. The full GDS is available as [`chip_final_ring.gds.gz`](12_chip_physical/results/chip_final_ring.gds.gz).
 
 To open the GDS in KLayout on Ubuntu/WSL:
 
