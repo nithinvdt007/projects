@@ -1,12 +1,6 @@
 source 12_chip_physical/scripts/common.tcl
-
-
-read_lef $TECH_LEF
-read_lef "$PDK/libs.ref/sky130_fd_sc_hd/lef/sky130_fd_sc_hd.lef"
-read_lef "$PDK/libs.ref/sky130_fd_io/lef/sky130_ef_io.lef"
-read_lef "$PDK/libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_8x1024_8.lef"
-read_liberty "$PDK/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
-read_liberty "$PDK/libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_8x1024_8_TT_1p8V_25C.lib"
+load_chip_lefs
+load_chip_libs
 
 read_verilog 09_place_and_route/route_output.v
 read_verilog 02_chip_io/chip_io_wrapper.v
@@ -31,5 +25,4 @@ write_db 12_chip_physical/results/chip_floorplan.odb
 write_def 12_chip_physical/results/chip_floorplan.def
 
 puts "CHIP FLOORPLAN CREATED"
-
 

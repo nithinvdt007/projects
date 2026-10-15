@@ -1,6 +1,6 @@
 # Project gallery
 
-A few snapshots from the project run, from lint through layout. Select an image to see it full size.
+Core-flow screenshots are retained here to document the original RTL-to-GDS learning stages.
 
 | Lint | Synthesis | Synthesis statistics |
 |---|---|---|
@@ -10,21 +10,15 @@ A few snapshots from the project run, from lint through layout. Select an image 
 |---|---|---|
 | [<img src="FLOORPLAN.jpg" alt="Core floorplan view" width="240">](FLOORPLAN.jpg) | [<img src="PLACEMENT.jpg" alt="Core placement view" width="240">](PLACEMENT.jpg) | [<img src="CLOCKTREESYNTHESIS.jpg" alt="Core clock-tree synthesis output" width="240">](CLOCKTREESYNTHESIS.jpg) |
 
-| Core route-stage view | Core timing analysis | Core layout screenshot |
+| Core route-stage view | Core timing analysis | Core GDS screenshot |
 |---|---|---|
 | [<img src="POSTROUTECTS.jpg" alt="Core post-CTS and route-stage output" width="240">](POSTROUTECTS.jpg) | [<img src="STA.jpg" alt="Core static timing analysis" width="240">](STA.jpg) | [<img src="GDS.jpg" alt="Core GDS layout screenshot" width="240">](GDS.jpg) |
 
-## Post-I/O-pad chip integration
+## Corrected chip-I/O preview
 
-These additional captures document the pad-integrated `chip_io_wrapper` flow. The floorplan image is the core floorplanning log used as context; placement, CTS, detailed route, STA, and the final KLayout view are from the SRAM-backed chip integration run.
+This is the global-route preview from the direct OpenROAD run. It is not a detailed-routed chip GDS and does not establish DRC/LVS signoff.
 
-| Floorplanning context | SRAM placement | CTS with SRAM |
-|---|---|---|
-| [<img src="CHIP_IO/core_floorplan.jpg" alt="Core floorplan context" width="240">](CHIP_IO/core_floorplan.jpg) | [<img src="CHIP_IO/placement_with_sram.jpg" alt="Placement with SRAM" width="240">](CHIP_IO/placement_with_sram.jpg) | [<img src="CHIP_IO/cts_with_sram.jpg" alt="Clock tree synthesis with SRAM" width="240">](CHIP_IO/cts_with_sram.jpg) |
+[<img src="CHIP_IO/preview.png" alt="Corrected chip-I/O global-route GDS preview" width="720">](CHIP_IO/preview.png)
 
-| Detailed-route log | STA with SRAM | Final chip GDS in KLayout |
-|---|---|---|
-| [<img src="CHIP_IO/detailed_route_log.jpg" alt="Detailed routing log with SRAM" width="240">](CHIP_IO/detailed_route_log.jpg) | [<img src="CHIP_IO/sta_with_sram.jpg" alt="Timing report with SRAM" width="240">](CHIP_IO/sta_with_sram.jpg) | [<img src="CHIP_IO/chip_final_ring_klayout.png" alt="Post-I/O-integration chip GDS in KLayout" width="240">](CHIP_IO/chip_final_ring_klayout.png) |
-
-The final chip stream and its reported QoR are documented separately in [`12_chip_physical/README.md`](../12_chip_physical/README.md) and [`crucible-results/QOR_CHIP_IO.md`](../crucible-results/QOR_CHIP_IO.md). The reported metrics are not a full foundry DRC/LVS signoff. See [the flow notes](../docs/FLOW_STATUS.md) for the distinction between the original core-only route attempt and this post-I/O-integration result.
+See the [stage 12 run status](../12_chip_physical/STATUS.md) and [QoR summary](../crucible-results/QOR_CHIP_IO.md). The earlier chip-I/O result images have been removed from this gallery.
 

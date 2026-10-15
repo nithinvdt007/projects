@@ -1,0 +1,32 @@
+SHELL := /bin/bash
+
+.PHONY: help global-route all-preview gds-preview detailed-route gds clean
+
+help:
+	@echo "Targets:"
+	@echo "  make global-route    Run chip-I/O floorplan through global routing"
+	@echo "  make gds-preview     Stream out a GDS preview from global-route DEF"
+	@echo "  make all-preview     Run global-route flow and create preview GDS"
+	@echo "  make detailed-route Run detailed routing (can take a long time)"
+	@echo "  make gds             Stream out chip_final.gds from detailed-route DEF"
+	@echo "  make clean           Remove generated result/report files only"
+
+global-route:
+	./scripts/run_chip_io_flow.sh
+
+gds-preview:
+	./scripts/streamout_gds.sh preview
+
+all-preview: global-route gds-preview
+
+detailed-route:
+	./scripts/run_openroad_stage.sh 12_chip_physical/scripts/detailed_route.tcl
+
+gds:
+	./scripts/streamout_gds.sh detailed
+
+clean:
+	@find 12_chip_physical/results -mindepth 1 ! -name .gitkeep -exec rm -rf {} +
+	@find 12_chip_physical/reports -mindepth 1 ! -name .gitkeep -exec rm -rf {} +
+	@echo "Generated chip-I/O outputs removed; source inputs and scripts retained."
+

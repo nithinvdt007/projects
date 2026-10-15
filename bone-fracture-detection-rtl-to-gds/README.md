@@ -1,100 +1,36 @@
-<div align="center">
+# Bone Fracture Detection RTL-to-GDSII
 
-# Bone Fracture Detection
+An educational RTL-to-physical-design project for a rule-based bone-image decision pipeline, targeting SKY130A. It includes the core Verilog flow and a separate chip-I/O global-route preview around the SRAM-backed SPI core.
 
-### From Verilog RTL to a SKY130A physical-design flow
+> This is a learning project, not a clinically validated diagnostic tool or a tapeout-ready design.
 
-**Verilog** &nbsp;·&nbsp; **Yosys** &nbsp;·&nbsp; **OpenROAD** &nbsp;·&nbsp; **SKY130A**
+## Design and core flow
 
-<img src="OUTPUT%20PICTURES/GDS.jpg" alt="Layout view from a project run" width="760">
+The core top is `top_level_final_decision` in [`01_rtl/bone_fracture_top_combined.v`](01_rtl/bone_fracture_top_combined.v). The design processes a 3 × 3 pixel neighborhood, derives directional and edge features, accumulates rule scores, and produces a frame-level decision.
 
-*One of the layout views captured during the project.*
+The numbered directories document the core flow from lint through physical-verification setup. See the [core flow guide](docs/RTL_TO_GDSII_FLOW.md), [toolchain setup](docs/IGNY_SETUP.md), and [core flow status](docs/FLOW_STATUS.md). The core-only routing history is separate from the chip-I/O preview below.
 
-</div>
+## Chip-I/O global-route preview
 
-> **A note on the project:** This is an experimental hardware and learning
-> project, not a clinically validated diagnostic tool.
+Stage 12 integrates a six-pad `chip_io_wrapper` around the routed SRAM-backed SPI core and runs floorplanning, pad and cell placement, PDN, CTS, pre-route repair, and global routing with direct OpenROAD from a LibreLane devshell. See [`12_chip_physical/README.md`](12_chip_physical/README.md). From the repository root, run `make -f Makefile.chip-io global-route`.
 
-## The project
+| Metric | Corrected preview run |
+|---|---:|
+| Die / core area | 1500 × 1500 µm / 997,820.739 µm² |
+| Post-placement total instance area | 256,681.178 µm² (25.72% of core by calculation) |
+| Global route | 3015 nets; 184,740 µm estimated wirelength; 47,399 estimated vias; zero global-route overflow |
+| GDS output | Global-route preview, 21,828,588 bytes uncompressed |
+| Detailed route | **Incomplete:** timed out at ~110 s, 40% progress, 5,330 intermediate violations |
+| Power connectivity | **Failed:** `vccd` check failed; eight I/O rails have no physical special wires |
+| Post-route timing / power | Not supplied |
 
-This repository explores how a rule-based bone-image decision pipeline can
-be expressed in Verilog and taken through an RTL-to-GDSII flow. It brings
-together the hardware design, implementation scripts, setup notes, and
-screenshots from the project.
+This GDS is only a global-route preview. Routing guides are not completed detailed signal wires. Zero global-route overflow is not zero detailed-route DRC. Full detailed routing, power continuity, foundry DRC, and LVS remain unfinished. The raw logs and GDS inspection reports are retained in [`12_chip_physical/audit/`](12_chip_physical/audit/) and [`12_chip_physical/reports/`](12_chip_physical/reports/); see the [run status](12_chip_physical/STATUS.md) and [QoR details](crucible-results/QOR_CHIP_IO.md).
 
-The top-level module is `top_level_final_decision`, in
-[`01_rtl/bone_fracture_top_combined.v`](01_rtl/bone_fracture_top_combined.v).
-It accepts pixel-memory writes and programmable score thresholds, then
-produces a frame-level decision, a validity signal, and debug outputs.
+## Gallery
 
-## Inside the design
-
-Pixels are arranged into a 3 × 3 neighborhood. The RTL derives directional
-gradient and edge features, accumulates cluster, corner, chaos, and brightness
-scores, then combines those scores in a final vote.
-
-```text
-Pixel data → 3 × 3 window → edge features → rule scores → final vote
-```
-
-## Project at a glance
-
-| | |
-|---|---|
-| **Language** | Verilog |
-| **Target** | SKY130A standard-cell library |
-| **Tools** | Verilator · Yosys · OpenROAD / OpenSTA · Ignytion Crucible |
-| **In this repo** | Core RTL flow, stage 12 chip I/O integration, GDSII, screenshots, and reported QoR |
-| **Still to do** | Clean-room reproduction, complete raw reports, and full-chip physical verification |
-
-## Post-I/O integration run comparison
-
-The table compares the earlier Igny run's **reported** detailed-route result with a separate direct OpenROAD run from a LibreLane devshell. Both target the pad-integrated `chip_io_wrapper`; the alternate run completed global routing, but detailed routing timed out before completion.
-
-| Metric | Igny run (reported) | Direct OpenROAD run (logged) |
-|---|---|---|
-| Area / utilization | 238,732 µm²; 24% | 256,681 µm² total instances after placement; 25.72% of core by calculation (area definitions/endpoints differ) |
-| Timing / power | +6.406 / +0.404 ns slack; 2.680 mW reported | No post-route STA or power estimate |
-| Routing | Detailed route reported complete; ~128,821 µm and 21,216 vias reported | Global route: 184,740 µm estimated wire, 47,399 estimated vias, zero global-route overflow; detailed route timed out at 110 s / 40% with 5,330 intermediate violations |
-| GDS / checks | 14.5 MB final GDS reported; no confirmed full-chip DRC/LVS | 21.8 MB global-route preview; `vccd` power-connectivity check failed; detailed route, full DRC, and LVS incomplete |
-
-The routing values compare different stages, so the global-route estimates are not final detailed-route results. The earlier run also has a conflicting route screenshot and an empty archived DRC report. See the [full QoR comparison](crucible-results/QOR_CHIP_IO.md) and [alternate-run status](docs/CHIP_IO_STATUS.md) for provenance and limits.
-
-## Explore
-
-| Start here | What you’ll find |
-|---|---|
-| [RTL-to-GDSII flow](docs/RTL_TO_GDSII_FLOW.md) | A tour of the stages and commands to run them. |
-| [Toolchain setup](docs/IGNY_SETUP.md) | Ubuntu / WSL2, Ignytion Crucible, and SKY130A setup. |
-| [Flow notes](docs/FLOW_STATUS.md) | What is present in the repository and what the original core run showed. |
-| [Post-I/O chip integration](docs/CHIP_IO_STATUS.md) | Stage 12 scripts, chip GDS, screenshots, QoR, and verification limits. |
-| [Image gallery](OUTPUT%20PICTURES/README.md) | Screenshots from lint through the layout view. |
-| [Timing snapshot](docs/reports/post-placement-sta.md) | The archived TT / SS placement-based timing summary. |
-
-## Give it a try
-
-The flow was developed in Ubuntu / WSL2. Once the tools are installed and the
-workspace is configured, start with lint:
-
-```bash
-igny run make lint
-```
-
-Then follow the [flow guide](docs/RTL_TO_GDSII_FLOW.md), running each stage in
-order and checking its output before continuing.
-
-## A note on the results
-
-The screenshots and timing summary record the supplied core-flow run. That
-core-only run later encountered TritonRoute error `DRT-0305`. This repository
-also includes a separate post-I/O-pad integration run with the
-`chip_io_wrapper` top and `chip_final_ring.gds`; its QoR summary is reported
-with evidence caveats, and full-chip foundry DRC/LVS is not included. See the
-[chip I/O status](docs/CHIP_IO_STATUS.md), [chip stage guide](12_chip_physical/README.md),
-and [QoR summary](crucible-results/QOR_CHIP_IO.md).
+See the [project gallery](OUTPUT%20PICTURES/README.md) for core-flow screenshots and the corrected chip-I/O preview.
 
 ## License
 
-No project license has been provided. Please check with the relevant authors
-before redistributing the RTL, and review the terms for any third-party tools
-or PDK material you use.
+No project license has been provided. Review the terms for the RTL authors, tools, and third-party PDK content before redistribution.
+

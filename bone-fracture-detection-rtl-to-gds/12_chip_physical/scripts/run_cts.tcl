@@ -1,15 +1,7 @@
+
 source 12_chip_physical/scripts/common.tcl
-
-
-
-read_lef $TECH_LEF
-read_lef "$PDK/libs.ref/sky130_fd_sc_hd/lef/sky130_fd_sc_hd.lef"
-read_lef "$PDK/libs.ref/sky130_fd_io/lef/sky130_ef_io.lef"
-read_lef "$PDK/libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_8x1024_8.lef"
-
-read_liberty "$PDK/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
-read_liberty "$PDK/libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_8x1024_8_TT_1p8V_25C.lib"
-read_liberty "$PDK/libs.ref/sky130_fd_io/lib/sky130_ef_io__gpiov2_pad_tt_tt_025C_1v80_3v30.lib"
+load_chip_lefs
+load_chip_libs
 
 read_db 12_chip_physical/results/chip_pdn.odb
 
@@ -54,9 +46,8 @@ set_propagated_clock [all_clocks]
 estimate_parasitics -placement
 report_cts
 
-# Keep the old chip_cts files unchanged for now.
-write_db 12_chip_physical/results/chip_cts_hierarchy_fixed.odb
-write_def 12_chip_physical/results/chip_cts_hierarchy_fixed.def
-puts "HIERARCHY-AWARE CHIP CTS COMPLETED"
-
+# Save the chip-level CTS checkpoint.
+write_db 12_chip_physical/results/chip_cts.odb
+write_def 12_chip_physical/results/chip_cts.def
+puts "CHIP CTS COMPLETED"
 
