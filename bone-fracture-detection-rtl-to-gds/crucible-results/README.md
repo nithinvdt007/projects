@@ -9,6 +9,10 @@ This folder records the Crucible-based SKY130A implementation results for the bo
 - **Top module:** `top_level_final_decision`
 - **Environment:** Ignytion Crucible `bone`
 
+## Related non-Crucible results
+
+Simulation outcomes transcribed from the supplied research paper are documented in [PAPER_SIMULATION_RESULTS.md](PAPER_SIMULATION_RESULTS.md). They are attributed to the paper and are not Crucible-run measurements.
+
 ## Reported QoR snapshot
 
 See [QOR_SUMMARY.md](QOR_SUMMARY.md) for the metrics captured from the Crucible run.

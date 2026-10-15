@@ -60,7 +60,7 @@ Use the numbered stage directories for the scripts and inputs. The root [Makefil
 
 ## Results and screenshots
 
-The [gallery](OUTPUT%20PICTURES/README.md) contains the supplied core RTL-to-GDS screenshots with the SRAM macro, captured before I/O pad integration. The completed post-I/O result is shown separately with its final GDS screenshot and saved QoR/report files. The full GDS is available as [`chip_final_ring.gds.gz`](12_chip_physical/results/chip_final_ring.gds.gz).
+Paper-reported simulation outcomes are documented separately in [PAPER_SIMULATION_RESULTS.md](crucible-results/PAPER_SIMULATION_RESULTS.md); they are non-Crucible research-paper results and are kept distinct from implementation QoR. The [gallery](OUTPUT%20PICTURES/README.md) contains the supplied core RTL-to-GDS screenshots with the SRAM macro, captured before I/O pad integration. The completed post-I/O result is shown separately with its final GDS screenshot and saved QoR/report files. The full GDS is available as [`chip_final_ring.gds.gz`](12_chip_physical/results/chip_final_ring.gds.gz).
 
 To open the GDS in KLayout on Ubuntu/WSL:
 
