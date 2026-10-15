@@ -1,12 +1,14 @@
-# Post-I/O global-route preview status
+# Chip-I/O detailed-route result
 
-The current chip-I/O result is a direct OpenROAD run from the LibreLane devshell and stops after global routing. It is not a detailed-route result.
+The current saved result is the completed SRAM-backed `chip_io_wrapper` run. It proceeds through chip-level floorplanning, pad placement, power-grid generation, clock handling, global routing, **detailed routing**, and GDS stream-out.
 
-- Global route: 3,015 nets, 184,740 µm estimated wirelength, 47,399 estimated vias, and zero global-route congestion overflow.
-- Detailed route: timed out after approximately 110 seconds at 40%, with 5,330 intermediate violations. No final detailed-route DRC count or detailed-route GDS exists.
-- Power: `vccd` connectivity check failed. The rails `vddio`, `vddio_q`, `vdda`, `vcchib`, `vswitch`, `vssio`, `vssio_q`, and `vssa` have no physical special wires.
-- Timing, power estimation, foundry DRC, and LVS: not supplied or not run.
-- The GDS is a global-route preview with placement, pad/SRAM geometry, and PDN; it does not contain fully routed signal wires.
+- Final detailed-route seed: 43; runtime: 303 s.
+- Detailed-route DRC: zero reported violations.
+- Final GDS: `chip_final_ring.gds` (14.5 MB before compression).
+- Die: 1500 × 1500 µm; reported area: 238,732 µm²; utilization: 24%.
+- Timing: TT 25 °C, 1.80 V, 20 ns target; setup / hold worst slack 6.406 / 0.404 ns; TNS 0.000 ns.
+- Power: 2.680 mW total; SRAM macro 98.9%, combinational logic 1.1%.
 
-See the [stage README](../12_chip_physical/README.md), [run status](../12_chip_physical/STATUS.md), and [QoR summary](../crucible-results/QOR_CHIP_IO.md). This page contains no metrics from the earlier chip-I/O run.
+See the [stage README](../12_chip_physical/README.md), [run status](../12_chip_physical/STATUS.md), and [full QoR table](../crucible-results/QOR_CHIP_IO.md). The final compressed GDS and seed-43 route DRC report are checked in under `12_chip_physical/`.
 
+The earlier global-route-only preview run is not the current result. The zero DRC figure refers to the detailed-route report; it does not imply that separate foundry DRC and LVS signoff checks were run.
