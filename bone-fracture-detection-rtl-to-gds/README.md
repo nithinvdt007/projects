@@ -47,6 +47,19 @@ Pixel data → 3 × 3 window → edge features → rule scores → final vote
 | **In this repo** | Core RTL flow, stage 12 chip I/O integration, GDSII, screenshots, and reported QoR |
 | **Still to do** | Clean-room reproduction, complete raw reports, and full-chip physical verification |
 
+## Post-I/O integration run comparison
+
+The table compares the earlier Igny run's **reported** detailed-route result with a separate direct OpenROAD run from a LibreLane devshell. Both target the pad-integrated `chip_io_wrapper`; the alternate run completed global routing, but detailed routing timed out before completion.
+
+| Metric | Igny run (reported) | Direct OpenROAD run (logged) |
+|---|---|---|
+| Area / utilization | 238,732 µm²; 24% | 256,681 µm² total instances after placement; 25.72% of core by calculation (area definitions/endpoints differ) |
+| Timing / power | +6.406 / +0.404 ns slack; 2.680 mW reported | No post-route STA or power estimate |
+| Routing | Detailed route reported complete; ~128,821 µm and 21,216 vias reported | Global route: 184,740 µm estimated wire, 47,399 estimated vias, zero global-route overflow; detailed route timed out at 110 s / 40% with 5,330 intermediate violations |
+| GDS / checks | 14.5 MB final GDS reported; no confirmed full-chip DRC/LVS | 21.8 MB global-route preview; `vccd` power-connectivity check failed; detailed route, full DRC, and LVS incomplete |
+
+The routing values compare different stages, so the global-route estimates are not final detailed-route results. The earlier run also has a conflicting route screenshot and an empty archived DRC report. See the [full QoR comparison](crucible-results/QOR_CHIP_IO.md) and [alternate-run status](docs/CHIP_IO_STATUS.md) for provenance and limits.
+
 ## Explore
 
 | Start here | What you’ll find |
