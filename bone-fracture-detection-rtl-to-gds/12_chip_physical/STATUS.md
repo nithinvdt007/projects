@@ -23,6 +23,6 @@
 - Total power: 2.680 mW (macro 98.9%, combinational logic 1.1%).
 - Detailed route: zero reported OpenROAD route DRC violations; approximately 128,821 µm wire length and 21,216 vias.
 
-See the [QoR table](../crucible-results/QOR_CHIP_IO.md). The GDS and seed-43 route DRC report are checked in under `results/` and `reports/`; the single final chip screenshot is under [`OUTPUT PICTURES/CHIP_IO/`](../OUTPUT%20PICTURES/CHIP_IO/).
+See the [QoR table](../crucible-results/QOR_CHIP_IO.md). The final GDS and seed-43 route DRC report are checked in under `results/` and `reports/`; the single final chip screenshot is under [`OUTPUT PICTURES/CHIP_IO/`](../OUTPUT%20PICTURES/CHIP_IO/).
 
-The reported zero is the detailed-route DRC result. It does not by itself state that independent foundry DRC or LVS signoff was run.
+The reported zero is the detailed-route DRC result. It does not by itself state that independent foundry DRC or LVS signoff was run. Earlier preview-run logs and inspection reports remain archived in [`audit/`](audit/) and [`reports/`](reports/); they describe a separate preliminary run, not this completed result.

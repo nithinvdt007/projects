@@ -71,7 +71,7 @@ klayout /tmp/chip_final_ring.gds
 
 ## Run environment
 
-The completed run was made in the Ubuntu Igny `spi` environment with SKY130A. The saved final deliverables include the detailed-route DEF, seed-43 route DRC report, final GDS, and timing reports in the supplied `FINAL DONE.zip`. The concise QoR summary is kept in this repository under [`crucible-results/`](crucible-results/).
+The completed run was made in the Ubuntu Igny `spi` environment with SKY130A. The supplied `FINAL DONE.zip` contains the detailed-route DEF, seed-43 DRC report, final GDS, and STA snapshots. This repository now includes the final compressed GDS, the route DRC report, and the QoR summary. Earlier preview-run logs and geometry reports are retained under [`12_chip_physical/audit/`](12_chip_physical/audit/) as historical evidence; they do not describe the final run.
 
 ## Project map
 

@@ -27,7 +27,7 @@ The final screenshot is in [`OUTPUT PICTURES/CHIP_IO/`](../OUTPUT%20PICTURES/CHI
 4. Run global routing, then complete detailed routing with seed 43.
 5. Stream out and inspect the final GDS.
 
-The completed-run values are summarized in [`crucible-results/QOR_CHIP_IO.md`](../crucible-results/QOR_CHIP_IO.md). The [status page](STATUS.md) lists the delivered artifacts and the verification scope.
+The completed-run values are summarized in [`crucible-results/QOR_CHIP_IO.md`](../crucible-results/QOR_CHIP_IO.md). The [status page](STATUS.md) lists the delivered artifacts and the verification scope. Historical logs from an earlier preliminary preview run are retained in [`audit/`](audit/) and clearly separated from these final results.
 
 ## Re-run
 

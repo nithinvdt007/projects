@@ -18,6 +18,6 @@ These earlier screenshots document the core RTL-to-GDS flow **without the SRAM m
 
 ## Completed chip-I/O layout
 
-This is the single supplied screenshot of the final SRAM-integrated, I/O-padded chip after detailed routing. It corresponds to `chip_final_ring.gds`; the [QoR summary](../crucible-results/QOR_CHIP_IO.md) and [run status](../12_chip_physical/STATUS.md) describe the reports.
+This is the single final chip screenshot supplied for the SRAM-integrated, I/O-padded design after detailed routing. It corresponds to `chip_final_ring.gds`; the [QoR summary](../crucible-results/QOR_CHIP_IO.md) and [run status](../12_chip_physical/STATUS.md) describe the final reports. The older global-route preview is retained as historical evidence but is not the final layout shown here.
 
 [<img src="CHIP_IO/chip_final_ring.png" alt="Final detailed-routed chip GDS with SRAM and I/O pads" width="760">](CHIP_IO/chip_final_ring.png)
