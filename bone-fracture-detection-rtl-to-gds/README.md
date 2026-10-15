@@ -44,8 +44,21 @@ Pixel data → 3 × 3 window → edge features → rule scores → final vote
 | **Language** | Verilog |
 | **Target** | SKY130A standard-cell library |
 | **Tools** | Verilator · Yosys · OpenROAD / OpenSTA · Ignytion Crucible |
-| **In this repo** | RTL, flow scripts, setup notes, timing summary, nine screenshots |
-| **Still to do** | Reproducible end-to-end run, clean routing, post-route timing, physical verification |
+| **In this repo** | Core RTL flow, stage 12 chip I/O integration, GDSII, screenshots, and reported QoR |
+| **Still to do** | Clean-room reproduction, complete raw reports, and full-chip physical verification |
+
+## Post-I/O integration run comparison
+
+The table compares the earlier Igny run's **reported** detailed-route result with a separate direct OpenROAD run from a LibreLane devshell. Both target the pad-integrated `chip_io_wrapper`; the alternate run completed global routing, but detailed routing timed out before completion.
+
+| Metric | Igny run (reported) | Direct OpenROAD run (logged) |
+|---|---|---|
+| Area / utilization | 238,732 µm²; 24% | 256,681 µm² total instances after placement; 25.72% of core by calculation (area definitions/endpoints differ) |
+| Timing / power | +6.406 / +0.404 ns slack; 2.680 mW reported | No post-route STA or power estimate |
+| Routing | Detailed route reported complete; ~128,821 µm and 21,216 vias reported | Global route: 184,740 µm estimated wire, 47,399 estimated vias, zero global-route overflow; detailed route timed out at 110 s / 40% with 5,330 intermediate violations |
+| GDS / checks | 14.5 MB final GDS reported; no confirmed full-chip DRC/LVS | 21.8 MB global-route preview; `vccd` power-connectivity check failed; detailed route, full DRC, and LVS incomplete |
+
+The routing values compare different stages, so the global-route estimates are not final detailed-route results. The earlier run also has a conflicting route screenshot and an empty archived DRC report. See the [full QoR comparison](crucible-results/QOR_CHIP_IO.md) and [alternate-run status](docs/CHIP_IO_STATUS.md) for provenance and limits.
 
 ## Explore
 
@@ -53,7 +66,8 @@ Pixel data → 3 × 3 window → edge features → rule scores → final vote
 |---|---|
 | [RTL-to-GDSII flow](docs/RTL_TO_GDSII_FLOW.md) | A tour of the stages and commands to run them. |
 | [Toolchain setup](docs/IGNY_SETUP.md) | Ubuntu / WSL2, Ignytion Crucible, and SKY130A setup. |
-| [Flow notes](docs/FLOW_STATUS.md) | What is present in the repository and what the original run showed. |
+| [Flow notes](docs/FLOW_STATUS.md) | What is present in the repository and what the original core run showed. |
+| [Post-I/O chip integration](docs/CHIP_IO_STATUS.md) | Stage 12 scripts, chip GDS, screenshots, QoR, and verification limits. |
 | [Image gallery](OUTPUT%20PICTURES/README.md) | Screenshots from lint through the layout view. |
 | [Timing snapshot](docs/reports/post-placement-sta.md) | The archived TT / SS placement-based timing summary. |
 
@@ -71,12 +85,13 @@ order and checking its output before continuing.
 
 ## A note on the results
 
-The screenshots and timing summary are records from the supplied project run.
-They make a useful tour of the flow, but a fresh end-to-end run has not been
-established from this repository. A later routing attempt encountered
-TritonRoute error `DRT-0305`; post-route timing and DRC / LVS verification
-remain to be completed. The gallery contains a layout screenshot, not a GDSII
-file. See [Flow notes](docs/FLOW_STATUS.md) for details.
+The screenshots and timing summary record the supplied core-flow run. That
+core-only run later encountered TritonRoute error `DRT-0305`. This repository
+also includes a separate post-I/O-pad integration run with the
+`chip_io_wrapper` top and `chip_final_ring.gds`; its QoR summary is reported
+with evidence caveats, and full-chip foundry DRC/LVS is not included. See the
+[chip I/O status](docs/CHIP_IO_STATUS.md), [chip stage guide](12_chip_physical/README.md),
+and [QoR summary](crucible-results/QOR_CHIP_IO.md).
 
 ## License
 
