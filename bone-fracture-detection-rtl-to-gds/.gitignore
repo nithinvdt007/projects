@@ -28,3 +28,10 @@ __pycache__/
 !11_physical_verification/results/.gitkeep
 *.vcd
 !artifacts/snapshot/top_level_final_decision.gds
+
+# Chip-I/O preview outputs (archive the completed preview only)
+12_chip_physical/results/*
+!12_chip_physical/results/.gitkeep
+!12_chip_physical/results/chip_global_route_preview.gds.gz
+12_chip_physical/reports/*.rpt*
+12_chip_physical/reports/*.log

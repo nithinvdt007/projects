@@ -1,18 +1,8 @@
 source 12_chip_physical/scripts/common.tcl
+load_chip_lefs
+load_chip_libs
 
-
-read_lef $TECH_LEF
-read_lef "$PDK/libs.ref/sky130_fd_sc_hd/lef/sky130_fd_sc_hd.lef"
-read_lef "$PDK/libs.ref/sky130_fd_io/lef/sky130_ef_io.lef"
-read_lef "$PDK/libs.ref/sky130_sram_macros/lef/sky130_sram_1kbyte_1rw1r_8x1024_8.lef"
-
-read_liberty "$PDK/libs.ref/sky130_fd_sc_hd/lib/sky130_fd_sc_hd__tt_025C_1v80.lib"
-read_liberty "$PDK/libs.ref/sky130_sram_macros/lib/sky130_sram_1kbyte_1rw1r_8x1024_8_TT_1p8V_25C.lib"
-read_liberty "$PDK/libs.ref/sky130_fd_io/lib/sky130_ef_io__gpiov2_pad_tt_tt_025C_1v80_3v30.lib"
-
-read_db 12_chip_physical/results/chip_timing_repaired_clean.odb
-
-# GLOBAL_ROUTE_HIERARCHY_CHECK
+read_db 12_chip_physical/results/chip_route_ready.odb
 
 # Verify SRAM macro by master type, not escaped hierarchy path.
 set block [ord::get_db_block]
@@ -83,16 +73,16 @@ global_connect
 
 # Physical tie cells for constant nets.
 global_connect
+place_io_terminals u_pad_*/PAD
 detailed_placement
 create_clock -name core_clk -period 20 [get_ports {pad_clk}]
 set_propagated_clock [all_clocks]
 
 set_wire_rc -signal -layer met2
 set_wire_rc -clock -layer met5
-set_routing_layers -signal met1-met5 -clock met1-met5
+set_routing_layers -signal met3-met5 -clock met3-met5
 estimate_parasitics -placement
 
-place_io_terminals u_pad_*/PAD
 pin_access
 global_route \
   -guide_file 12_chip_physical/results/chip_route.guide \
@@ -100,13 +90,9 @@ global_route \
   -verbose
 
 estimate_parasitics -global_routing
-report_worst_slack -min -digits 3
-report_worst_slack -max -digits 3
-report_tns -digits 3
 
-write_db 12_chip_physical/results/chip_global_route_hierarchy_fixed.odb
-write_def 12_chip_physical/results/chip_global_route_hierarchy_fixed.def
+write_db 12_chip_physical/results/chip_global_route.odb
+write_def 12_chip_physical/results/chip_global_route.def
 
 puts "CHIP GLOBAL ROUTING COMPLETED"
-
 
