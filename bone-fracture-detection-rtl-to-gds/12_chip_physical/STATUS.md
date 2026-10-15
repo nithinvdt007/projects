@@ -1,32 +1,28 @@
-# Direct OpenROAD chip I/O run status
+# Completed chip-I/O run status
 
-**Result class:** corrected global-route preview, not final detailed route  
-**Run date:** 2026-10-15  
-**Toolchain:** LibreLane devshell 3.0.16; OpenROAD `dcf36133`; Magic 8.3.623; Netgen 1.5.316; KLayout 0.30.7  
-**PDK:** SKY130A CIEL revision `8afc8346a57fe1ab7934ba5a6056ea8b43078e71`
+**Result:** detailed-routed chip-I/O layout and final GDS  
+**Run:** seed 43; 303 s detailed-route runtime  
+**Platform:** Ubuntu / Igny `spi` environment  
+**PDK / corner:** SKY130A; TT, 25 °C, 1.80 V  
+**Clock target:** 20 ns
 
-## Completed
+## Completed stages
 
-- Floorplan, six GPIO pad placement, core placement/legalization, core PDN, CTS (three inserted clock buffers), pre-route preparation, and global routing.
-- Global routing completed for 3,015 nets with 184,740 µm estimated wirelength and 47,399 estimated vias. Final global-route congestion overflow was zero.
-- Global-route GDS preview was streamed out and read back. It identifies top cell `chip_io_wrapper`, six GPIO pads, and one SRAM. The pad and SRAM source-geometry XOR checks each report zero polygon differences.
+- RTL lint and synthesis.
+- Core floorplanning and placement with the SRAM macro.
+- Clock-tree synthesis, core routing, and timing analysis.
+- Chip-level I/O wrapper and pad integration.
+- Chip floorplanning, pad placement, power-grid generation, and clock-tree handling.
+- Chip-level global routing and **completed detailed routing**.
+- Final GDS stream-out to `chip_final_ring.gds`.
 
-## Incomplete or failed
+## Final QoR
 
-- Detailed routing timed out about 110 seconds into the initial iteration. It reached 40% and reported 5,330 intermediate violations. These are not a final DRC count; there is no completed detailed-route DEF/GDS.
-- Power connectivity failed on `vccd`. The eight I/O rails `vddio`, `vddio_q`, `vdda`, `vcchib`, `vswitch`, `vssio`, `vssio_q`, and `vssa` have no physical special wires in the supplied connectivity summary.
-- Full-layout foundry DRC and LVS were not run. Signal-route completeness is not proven.
-- No post-route STA or power estimate is supplied.
-- The global-route preview is placement, macro geometry, and PDN. Routing guides are not detailed metal wires.
-- The preview GDS bounding box is `(0,-1.17)–(1500,1500.57) µm`, slightly beyond the nominal die because of source-cell geometry. One empty example cell, `sky130_fd_pr__gendlring__example_559591418081`, is retained from the source PDK.
+- Reported area: 238,732 µm²; utilization: 24%; die: 1500 × 1500 µm.
+- Setup / hold worst slack: 6.406 ns / 0.404 ns; TNS: 0.000 ns.
+- Total power: 2.680 mW (macro 98.9%, combinational logic 1.1%).
+- Detailed route: zero reported OpenROAD route DRC violations; approximately 128,821 µm wire length and 21,216 vias.
 
-## Placement context
+See the [QoR table](../crucible-results/QOR_CHIP_IO.md). The GDS and seed-43 route DRC report are checked in under `results/` and `reports/`; the single final chip screenshot is under [`OUTPUT PICTURES/CHIP_IO/`](../OUTPUT%20PICTURES/CHIP_IO/).
 
-- Nominal die: 1500 × 1500 µm.
-- Logged core area: 997,820.739 µm².
-- Floorplan effective utilization: 34.1% before placement.
-- Post-placement total instance area: 256,681.178 µm²; this is 25.72% of the logged core area by calculation. The OpenROAD standard-cell-only utilization field is 7.474% because it excludes fixed macro area.
-- SRAM was track-snapped from the requested `(300,300) µm` to `(300.910,300.030) µm`; no shrink was requested.
-
-See the saved stage logs in [`audit/`](audit/), the GDS inspection reports in [`reports/`](reports/), and the metric summary in [`../crucible-results/QOR_CHIP_IO.md`](../crucible-results/QOR_CHIP_IO.md).
-
+The reported zero is the detailed-route DRC result. It does not by itself state that independent foundry DRC or LVS signoff was run.

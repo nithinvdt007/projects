@@ -1,48 +1,43 @@
-# SKY130 chip I/O global-route preview
+# SKY130 chip-I/O integration — completed detailed route
 
-This stage integrates the routed SPI core netlist with a six-pad `chip_io_wrapper` and runs the design through global routing. It is **not** a completed detailed-route or tapeout flow.
+This stage wraps the SRAM-backed SPI core in `chip_io_wrapper`, adds the SKY130 I/O pads and power grid, and completes chip-level detailed routing and GDS stream-out.
 
-## Run from the repository root
+## Final result
 
-Requires Linux/WSL, the SKY130A PDK, OpenROAD, and Python KLayout. The validated alternate tool setup used a LibreLane devshell; this package can also use a compatible OpenROAD on `PATH`.
+| Metric | Result |
+|---|---:|
+| Die | 1500 × 1500 µm |
+| Reported area / utilization | 238,732 µm² / 24% |
+| Timing corner / clock target | TT, 25 °C, 1.80 V / 20 ns |
+| Setup / hold worst slack | 6.406 ns / 0.404 ns |
+| TNS | 0.000 ns |
+| Total power | 2.680 mW |
+| Detailed-route DRC | 0 reported violations |
+| Routed wire length / vias | ~128,821 µm / 21,216 |
+| Detailed-route seed / runtime | 43 / 303 s |
+| Final GDS | `chip_final_ring.gds`, 14.5 MB |
+
+The final screenshot is in [`OUTPUT PICTURES/CHIP_IO/`](../OUTPUT%20PICTURES/CHIP_IO/). The compressed final GDS and seed-43 DRC report are in [`results/`](results/) and [`reports/`](reports/).
+
+## Implementation sequence
+
+1. Floorplan the 1500 × 1500 µm chip around the routed core and SRAM.
+2. Place the GPIO pads and legalize core cells.
+3. Build the power distribution network and clock tree.
+4. Run global routing, then complete detailed routing with seed 43.
+5. Stream out and inspect the final GDS.
+
+The completed-run values are summarized in [`crucible-results/QOR_CHIP_IO.md`](../crucible-results/QOR_CHIP_IO.md). The [status page](STATUS.md) lists the delivered artifacts and the verification scope.
+
+## Re-run
+
+Use Ubuntu/WSL with the Igny `spi` environment and the SKY130A PDK configured:
 
 ```bash
-export LIBRELANE_DEVSHELL=/path/to/librelane-devshell-x86_64.AppImage
-export PDK_ROOT="$HOME/.ciel/ciel/sky130/versions/<revision>/sky130A"
+igny env use spi
 make -f Makefile.chip-io global-route
-make -f Makefile.chip-io gds-preview
+make -f Makefile.chip-io detailed-route
+make -f Makefile.chip-io gds
 ```
 
-The environment checker verifies the PDK LEFs, Liberty files, source GDS files, wrapper/netlist inputs, and layer map. `PDK_ROOT` must point to the full `sky130A` directory. See the toolchain setup notes in [`docs/IGNY_SETUP.md`](../docs/IGNY_SETUP.md) only if using the existing Igny environment.
-
-Main stages:
-
-1. Floorplan the 1500 × 1500 µm die with a 1000 × 1000 µm nominal core and SRAM macro.
-2. Place six GPIO signal pads and assign pad locations.
-3. Place/legalize core cells and top-level supply pins.
-4. Generate the core PDN.
-5. Build the clock tree.
-6. Perform pre-route timing/placement repair.
-7. Run global routing and write a route guide.
-8. Optionally try detailed routing with `make -f Makefile.chip-io detailed-route`.
-
-The included `12_chip_physical/results/chip_global_route_preview.gds.gz` is generated from the global-route DEF. Global routing creates guides; this stream does **not** contain completed detailed signal wires. It is useful for viewing placement, macro/pad geometry, and the power grid only. Decompress it before opening in KLayout:
-
-```bash
-gzip -dk 12_chip_physical/results/chip_global_route_preview.gds.gz
-klayout 12_chip_physical/results/chip_global_route_preview.gds
-```
-
-## Latest saved run status
-
-The direct OpenROAD run completed global routing for 3015 nets with 184,740 µm estimated wirelength, 47,399 estimated vias, and zero global-route overflow. It did not complete detailed routing: the run timed out after 110 seconds at 40%, with 5,330 intermediate violations. The `vccd` power-connectivity check failed, and eight I/O rails have no physical special wires. No post-route STA, power estimate, full-layout DRC, or LVS result is supplied. See [`STATUS.md`](STATUS.md) and [`../crucible-results/QOR_CHIP_IO.md`](../crucible-results/QOR_CHIP_IO.md).
-
-## Sources and generated outputs
-
-- Inputs: [`02_chip_io/chip_io_wrapper.v`](../02_chip_io/chip_io_wrapper.v), [`09_place_and_route/route_output.v`](../09_place_and_route/route_output.v), and an installed SKY130A PDK.
-- Scripts: [`scripts/`](scripts/) and [`../scripts/`](../scripts/) (runner/stream-out helpers).
-- Execution logs and preview geometry checks: [`audit/`](audit/) and [`reports/`](reports/).
-- Generated ODB, DEF, route guides, detailed-route reports, and temporary GDS outputs go under `results/` and `reports/` and are ignored by Git, except the explicitly archived compressed preview GDS and audit artifacts.
-
-The preview bounding box slightly exceeds the nominal die because of source-cell geometry. One empty example cell from the source PDK is retained. Neither observation is a signoff check. Review third-party PDK licenses before redistributing generated layout.
-
+The checked-in final GDS is the saved seed-43 result. The QoR summary records its run metrics; a new run may differ if the tool versions, PDK revision, constraints, or routing seed change.
